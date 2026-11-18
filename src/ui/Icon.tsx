@@ -3,7 +3,8 @@ import {
   ArrowLeft, BedDouble, Bus, Calendar, ChartPie, ChevronDown, ChevronRight, CircleEllipsis, DatabaseBackup, Download,
   Gift, GraduationCap, HeartPulse, House, Info, Landmark, Languages, Layers, LayoutGrid, Map, MapPin, Pencil, PiggyBank,
   Plane, Plus, Receipt, RefreshCw, ScanLine, Search, Settings, Shirt, ShoppingCart, Smartphone, Sofa, Store, Upload, UserRound,
-  Users, Utensils, Wallet, WashingMachine, X, type LucideIcon,
+  Users, Utensils, Wallet, WashingMachine, X, Trash2, Banknote, ArrowDownLeft, SlidersHorizontal, Repeat, ShoppingBag,
+  Shield, KeyRound, CircleHelp, Heart, Sun, Moon, Monitor, Palette, FileSpreadsheet, type LucideIcon,
 } from "lucide-react";
 
 const ICONS: Record<string, LucideIcon> = {
@@ -14,7 +15,9 @@ const ICONS: Record<string, LucideIcon> = {
   "piggy-bank": PiggyBank, plane: Plane, plus: Plus, receipt: Receipt, "refresh-cw": RefreshCw, "scan-line": ScanLine,
   search: Search, settings: Settings, shirt: Shirt, "shopping-cart": ShoppingCart, smartphone: Smartphone, sofa: Sofa,
   store: Store, upload: Upload, "user-round": UserRound, users: Users, utensils: Utensils, wallet: Wallet,
-  "washing-machine": WashingMachine, x: X,
+  "washing-machine": WashingMachine, x: X, "trash-2": Trash2, banknote: Banknote, "arrow-down-left": ArrowDownLeft,
+  "sliders-horizontal": SlidersHorizontal, repeat: Repeat, "shopping-bag": ShoppingBag, shield: Shield, "key-round": KeyRound,
+  "circle-help": CircleHelp, heart: Heart, sun: Sun, moon: Moon, monitor: Monitor, palette: Palette, "file-spreadsheet": FileSpreadsheet,
 };
 
 export function Icon({ name }: { name: string }) {

@@ -1,21 +1,20 @@
-import { BarController, BarElement, CategoryScale, Chart as ChartJS, LinearScale, Tooltip } from "chart.js";
 import { Bar } from "react-chartjs-2";
 import { useI18n } from "../i18n/I18n";
 import { cfg, latestBalance, live, mine, monthSummary, openFriends, plan, sum, isPending } from "../lib/calc";
 import { dShort, mKey, monthName, n0, prevMonth, tl, zl, zl0, daysBetween } from "../lib/format";
 import type { Dataset } from "../lib/types";
 import { Icon } from "../ui/Icon";
-import { BankBoxes, TopBar, TxRow, UpdLine, esc } from "../ui/parts";
+import { AddButton, BankBoxes, TopBar, TxRow, UpdLine, esc } from "../ui/parts";
 import { go, useApp } from "../ui/state";
+import { useChartColors } from "../ui/theme";
 
-ChartJS.register(BarController, BarElement, CategoryScale, LinearScale, Tooltip);
-const css = (v: string) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
 
 const BACKUP_DAYS = 14;
 
 export function Home({ ds }: { ds: Dataset }) {
   const { t } = useI18n();
-  const { todayStr, toast } = useApp();
+  const { todayStr, setSheet } = useApp();
+  const col = useChartColors();
   const c = cfg(ds);
   const empty = ds.expenses.length === 0 && ds.balances.length === 0;
 
@@ -23,7 +22,7 @@ export function Home({ ds }: { ds: Dataset }) {
     <TopBar
       title={t.appTitle}
       lead={<button className="iconbtn" type="button" aria-label={t.common.menu} onClick={() => go("daha")} style={{ marginRight: 2 }}><Icon name="user-round" /></button>}
-      actions={<button className="iconbtn" type="button" aria-label={t.common.search} onClick={() => { go("hareketler"); setTimeout(() => document.getElementById("q")?.focus(), 80); }}><Icon name="search" /></button>}
+      actions={<><button className="iconbtn" type="button" aria-label={t.common.search} onClick={() => { go("hareketler"); setTimeout(() => document.getElementById("q")?.focus(), 80); }}><Icon name="search" /></button><AddButton /></>}
     />
   );
 
@@ -60,7 +59,7 @@ export function Home({ ds }: { ds: Dataset }) {
   const prevList = live(ds).filter((x) => mKey(x.d) === pk && !x.trip && +x.d.slice(8) <= s.dayNo);
   const dlt = s.dSum - sum(prevList, (x) => mine(c, x));
 
-  const accent = css("--accent") || "#2350F5";
+  const accent = col.accent;
   const mn = monthName(s.m);
 
   return (
@@ -74,9 +73,9 @@ export function Home({ ds }: { ds: Dataset }) {
         <div className="accounts"><BankBoxes accounts={ds.accounts} b={b} /></div>
       </section>
       <div className="actions">
-        <button className="action" type="button" onClick={() => toast(t.common.soon)}><span className="circ"><Icon name="plus" /></span>{t.home.add}</button>
+        <button className="action" type="button" onClick={() => setSheet({ kind: "expense" })}><span className="circ"><Icon name="plus" /></span>{t.home.add}</button>
         <button className="action" type="button" onClick={() => go("hareketler")}><span className="circ"><Icon name="search" /></span>{t.home.search}</button>
-        <button className="action" type="button" onClick={() => toast(t.common.soon)}><span className="circ"><Icon name="refresh-cw" /></span>{t.home.balance}</button>
+        <button className="action" type="button" onClick={() => setSheet({ kind: "balance" })}><span className="circ"><Icon name="refresh-cw" /></span>{t.home.balance}</button>
         <button className="action" type="button" onClick={() => go("plan")}><span className="circ"><Icon name="piggy-bank" /></span>{t.home.plan}</button>
       </div>
       <section className="card">
@@ -85,6 +84,7 @@ export function Home({ ds }: { ds: Dataset }) {
         <div className="meter"><i className={s.pct > 1 ? "over" : ""} style={{ width: Math.min(100, s.pct * 100).toFixed(1) + "%" }} /></div>
         <div className="chartbox" style={{ height: 84, margin: "-2px 0 10px" }}>
           <Bar
+            key={String(col.dark)}
             aria-label={t.home.dailyChart}
             data={{
               labels: s.perDayVals.map((_, i) => String(i + 1)),

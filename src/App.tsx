@@ -1,11 +1,21 @@
 import { useEffect } from "react";
 import { requestPersist } from "./db/db";
 import { useI18n } from "./i18n/I18n";
+import { Analysis } from "./screens/Analysis";
 import { Home } from "./screens/Home";
-import { More, Placeholder } from "./screens/More";
+import { More } from "./screens/More";
 import { RestorePreview, Settings } from "./screens/Settings";
 import { Merchant, Picker, Transactions, TxDetail } from "./screens/Transactions";
 import { Icon } from "./ui/Icon";
+import { ExpenseForm } from "./screens/forms/ExpenseForm";
+import { TripForm } from "./screens/forms/TripForm";
+import { InflowForm } from "./screens/forms/InflowForm";
+import { Money } from "./screens/Money";
+import { Plan } from "./screens/Plan";
+import { Friends } from "./screens/Friends";
+import { TransferForm } from "./screens/forms/TransferForm";
+import { BalanceForm } from "./screens/forms/BalanceForm";
+import { TripDetail, Trips } from "./screens/Trips";
 import { Sheet, Toast } from "./ui/parts";
 import { useApp, useHashRoute } from "./ui/state";
 
@@ -30,11 +40,11 @@ export default function App() {
   else if (view === "yer") body = <Merchant ds={ds} />;
   else if (view === "daha") body = <More ds={ds} />;
   else if (view === "ayarlar") body = <Settings ds={ds} />;
-  else if (view === "analiz") body = <Placeholder title={t.nav.analysis} />;
-  else if (view === "geziler") body = <Placeholder title={t.nav.trips} />;
-  else if (view === "para") body = <Placeholder title={t.nav.money} />;
-  else if (view === "plan") body = <Placeholder title={t.more.items.plan[0]} back="para" />;
-  else if (view === "arkadaslar") body = <Placeholder title={t.more.items.arkadaslar[0]} back="daha" />;
+  else if (view === "analiz") body = <Analysis ds={ds} />;
+  else if (view === "geziler") body = route.startsWith("gezi-") ? <TripDetail ds={ds} id={route.slice(5)} /> : <Trips ds={ds} />;
+  else if (view === "para") body = <Money ds={ds} />;
+  else if (view === "plan") body = <Plan ds={ds} />;
+  else if (view === "arkadaslar") body = <Friends ds={ds} />;
 
   const nav: [string, string, string][] = [
     ["ana", "house", t.nav.home], ["hareketler", "receipt", t.nav.tx], ["analiz", "chart-pie", t.nav.analysis],
@@ -54,6 +64,11 @@ export default function App() {
       <Sheet open={!!sheet} onClose={() => setSheet(null)}>
         {ds && sheet?.kind === "tx" && <TxDetail ds={ds} id={sheet.id} />}
         {ds && sheet?.kind === "picker" && <Picker ds={ds} which={sheet.which} />}
+        {ds && sheet?.kind === "expense" && <ExpenseForm key={sheet.id ?? "new"} ds={ds} id={sheet.id} />}
+        {ds && sheet?.kind === "trip" && <TripForm key={sheet.id ?? "new"} ds={ds} id={sheet.id} />}
+        {ds && sheet?.kind === "inflow" && <InflowForm key={sheet.id ?? "new"} ds={ds} id={sheet.id} />}
+        {ds && sheet?.kind === "balance" && <BalanceForm ds={ds} />}
+        {ds && sheet?.kind === "transfer" && <TransferForm ds={ds} />}
         {sheet?.kind === "restore" && <RestorePreview data={sheet.data} exported={sheet.exported} />}
       </Sheet>
       <Toast />

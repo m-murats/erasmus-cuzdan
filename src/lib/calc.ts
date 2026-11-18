@@ -2,7 +2,7 @@
 // Hiçbiri veritabanına veya tarayıcıya dokunmaz; bu yüzden Vitest ile doğrudan test edilir.
 
 import { DEF } from "./constants";
-import { daysBetween, mKey } from "./format";
+import { daysBetween, mKey, prevMonth } from "./format";
 import type { Account, Balance, Dataset, Expense, Inflow, Settings, Trip } from "./types";
 
 export const sum = <T,>(a: T[], f: (x: T) => number) => a.reduce((s, x) => s + f(x), 0);
@@ -134,3 +134,90 @@ export function monthsList(ds: Dataset, todayStr: string) {
   ks.add(mKey(todayStr));
   return [...ks].sort();
 }
+
+// ---------- Aşama 2: Analiz, Geziler, Para ----------
+
+export function byCat(c: Settings, list: Expense[]) {
+  const m: Record<string, { v: number; n: number }> = {};
+  list.filter((x) => !isDep(x)).forEach((x) => {
+    m[x.cat] = m[x.cat] || { v: 0, n: 0 };
+    m[x.cat].v += mine(c, x);
+    m[x.cat].n++;
+  });
+  return Object.entries(m).sort((a, b) => b[1].v - a[1].v);
+}
+
+export type AnKind = "daily" | "trip" | "all";
+const kindFilter = (kind: AnKind) => (x: Expense) => (kind === "daily" ? !x.trip : kind === "trip" ? !!x.trip : true);
+
+/** Analiz ekranı: seçilen dönem (ay ya da "all") ve tür için tüm rakamlar */
+export function analysis(ds: Dataset, period: string, kind: AnKind, todayStr: string) {
+  const c = cfg(ds), lv = live(ds);
+  const list = lv.filter((x) => (period === "all" || mKey(x.d) === period) && kindFilter(kind)(x));
+  const tot = sum(list, (x) => mine(c, x));
+  const days = period === "all"
+    ? Math.max(1, daysBetween(c.start, todayStr) + 1)
+    : period === mKey(todayStr) ? +todayStr.slice(8) : new Date(+period.slice(0, 4), +period.slice(5), 0).getDate();
+  // Gün gün (yalnızca ay seçiliyse) ve geçen ayın aynı dönemiyle karşılaştırma
+  let daily: { vals: number[]; dim: number; prevSame: number; delta: number } | null = null;
+  if (period !== "all") {
+    const pk = prevMonth(period);
+    const pl = lv.filter((x) => mKey(x.d) === pk && kindFilter(kind)(x));
+    if (pl.length) {
+      const [y, mo] = period.split("-").map(Number), dim = new Date(y, mo, 0).getDate();
+      const vals = [...Array(dim)].map((_, i) => sum(list.filter((x) => +x.d.slice(8) === i + 1), (x) => mine(c, x)));
+      const prevSame = sum(pl.filter((x) => +x.d.slice(8) <= days), (x) => mine(c, x));
+      daily = { vals, dim, prevSame, delta: tot - prevSame };
+    }
+  }
+  // Aylara göre: günlük yaşam ve gezi ayrı
+  const months = monthsList(ds, todayStr).filter((k) => lv.some((x) => mKey(x.d) === k) || k === mKey(todayStr));
+  const monthly = months.map((k) => ({
+    k,
+    daily: sum(lv.filter((x) => mKey(x.d) === k && !x.trip), (x) => mine(c, x)),
+    trip: sum(lv.filter((x) => mKey(x.d) === k && x.trip), (x) => mine(c, x)),
+  }));
+  return { list, tot, days, perDay: tot / days, cats: byCat(c, list), daily, monthly, budget: c.budget };
+}
+
+/** Gezideki şehirler: önce gezinin şehir sırası, sonra diğerleri */
+export function tripCities(ds: Dataset, t: Trip, other: string) {
+  const c = cfg(ds), m: Record<string, { v: number; n: number }> = {};
+  ds.expenses.filter((x) => x.trip === t.id).forEach((x) => {
+    const k = x.city || other;
+    m[k] = m[k] || { v: 0, n: 0 };
+    m[k].v += mine(c, x);
+    m[k].n++;
+  });
+  const order = (t.cities || []).filter((k) => m[k]).concat(Object.keys(m).filter((k) => !(t.cities || []).includes(k)));
+  return order.map((k) => [k, m[k]] as const);
+}
+
+/** Para ekranı: gelen paralar, kaynaklara göre dağılım, hibe durumu */
+export function moneySummary(ds: Dataset) {
+  const c = cfg(ds);
+  const ins = [...ds.inflows].sort((a, b) => (a.d < b.d ? 1 : -1));
+  const totPL = sum(ins, (x) => inPLN(c, x));
+  const fees = sum(ins, (x) => toPLN(c, +x.fee || 0, x.cur));
+  const bySrc: Record<string, number> = {};
+  ins.forEach((x) => { const k = x.source || "Diğer"; bySrc[k] = (bySrc[k] || 0) + inPLN(c, x); });
+  const remain = balTotal(c, ds.accounts, latestBalance(ds));
+  const spent = totPL - remain;
+  const grantSrc = ds.sources.find((s) => /hibe/i.test(s.name || ""));
+  const gi = ins.filter((x) => x.source === "Hibe");
+  const grant = grantSrc
+    ? {
+        total: +grantSrc.amount || 0,
+        received: sum(gi, (x) => +x.amount || 0),
+        net: sum(gi, (x) => (+x.amount || 0) - (+x.fee || 0)),
+        note: grantSrc.note,
+      }
+    : null;
+  return {
+    ins, totPL, totEUR: totPL / c.eurpln, fees, remain, spent, usedPct: totPL ? spent / totPL : 0,
+    bySrc: Object.entries(bySrc).sort((a, b) => b[1] - a[1]), grant,
+  };
+}
+
+/** Gezinin banka hareketleriyle karşılaştırması (bankNetPLN girildiyse) */
+export const tripBankDiff = (ds: Dataset, t: Trip) => (t.bankNetPLN ? tripStats(ds, t).tot - t.bankNetPLN : null);

@@ -19,6 +19,8 @@ interface Ctx {
   setLang: (l: Lang) => void;
   /** Kategori adını ekranda gösterilecek dile çevirir */
   cat: (c: string) => string;
+  /** Veride Türkçe saklanan bir değeri (ödeme yöntemi, kaynak…) ekranda gösterilecek dile çevirir */
+  val: (v: string) => string;
 }
 const I18nCtx = createContext<Ctx | null>(null);
 
@@ -38,7 +40,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     const t = DICT[lang];
     document.documentElement.lang = lang;
     document.title = t.appTitle;
-    return { lang, t, setLang, cat: (c) => t.cats[c] || c };
+    return { lang, t, setLang, cat: (c) => t.cats[c] || c, val: (v) => t.vals[v] || v };
   }, [lang, setLang]);
   return <I18nCtx.Provider value={value}>{children}</I18nCtx.Provider>;
 }

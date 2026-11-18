@@ -6,7 +6,7 @@ import { amt, dayName, dShort, mKey, mName, tl, zl, zl0 } from "../lib/format";
 import { matches, merchant } from "../lib/search";
 import type { Dataset } from "../lib/types";
 import { Icon } from "../ui/Icon";
-import { Avatar, Grouped, SrcPill, TopBar } from "../ui/parts";
+import { AddButton, Avatar, Grouped, SrcPill, TopBar } from "../ui/parts";
 import { EMPTY_FILTER, go, useApp, type TxFilter } from "../ui/state";
 
 export function filterTx(ds: Dataset, f: TxFilter) {
@@ -43,7 +43,7 @@ export function Transactions({ ds }: { ds: Dataset }) {
 
   return (
     <>
-      <TopBar title={t.nav.tx} />
+      <TopBar title={t.nav.tx} actions={<AddButton />} />
       <div className="searchbar">
         <Icon name="search" />
         <input id="q" type="search" placeholder={t.tx.placeholder} value={q} aria-label={t.tx.searchLabel} autoComplete="off" onChange={(e) => setQ(e.target.value)} />
@@ -128,8 +128,8 @@ export function Picker({ ds, which }: { ds: Dataset; which: "period" | "kind" | 
 }
 
 export function TxDetail({ ds, id }: { ds: Dataset; id: string }) {
-  const { t, cat } = useI18n();
-  const { setSheet, setMerchantName, toast } = useApp();
+  const { t, cat, val } = useI18n();
+  const { setSheet, setMerchantName } = useApp();
   const x = ds.expenses.find((e) => e.id === id);
   if (!x) return null;
   const c = cfg(ds), tr = tripOf(ds, x), shared = Math.abs((+x.gross || 0) - (+x.share || 0)) > 0.005;
@@ -144,7 +144,7 @@ export function TxDetail({ ds, id }: { ds: Dataset; id: string }) {
       </div>
       <div className="kv">
         <div><span>{t.detail.category}</span><b>{cat(x.cat)}</b></div>
-        <div><span>{t.detail.payment}</span><b>{x.pay}</b></div>
+        <div><span>{t.detail.payment}</span><b>{val(x.pay)}</b></div>
         {x.cur === "EUR" && <div><span>{t.detail.plnValue}</span><b className="num">{zl(mine(c, x))}</b></div>}
         {shared && <>
           <div><span>{t.detail.totalPaid}</span><b className="num">{amt(+x.gross, x.cur)}</b></div>
@@ -157,7 +157,7 @@ export function TxDetail({ ds, id }: { ds: Dataset; id: string }) {
       </div>
       <div className="btns">
         <button className="btn left" type="button" onClick={() => { setSheet(null); setMerchantName(m); go("yer"); }}><Icon name="store" /> {t.detail.allAt(m)}</button>
-        <button className="btn" type="button" onClick={() => toast(t.common.soon)}><Icon name="pencil" /></button>
+        <button className="btn" type="button" onClick={() => setSheet({ kind: "expense", id: x.id })}><Icon name="pencil" /> {t.form.edit}</button>
       </div>
     </>
   );

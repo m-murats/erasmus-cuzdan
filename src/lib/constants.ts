@@ -38,6 +38,32 @@ export const brandOf = (t: string | undefined) => {
 };
 
 export const PAYS = ["Revolut PLN", "Revolut EUR", "Erste PLN", "Erste EUR", "Nakit", "Arkadaş ödedi"];
+export const PAY_CASH = "Nakit";
+export const PAY_FRIEND = "Arkadaş ödedi";
+
+/** Hesabın kısa adı: "Revolut PLN", nakit için yalnızca "Nakit" (prototipteki ödeme adlarıyla aynı) */
+export const accountLabel = (a: Account) => (a.bank === PAY_CASH ? PAY_CASH : `${a.bank} ${a.cur}`);
+/** Hesap listesinden benzersiz adlar; `keep` (kayıttaki mevcut değer) listede yoksa sona eklenir */
+export function accountLabels(accounts: Account[], keep?: string) {
+  const l = [...new Set(accounts.map(accountLabel))];
+  if (keep && !l.includes(keep)) l.push(keep);
+  return l;
+}
+/** Harcama formundaki ödeme seçenekleri: hesaplar + nakit + "arkadaş ödedi" */
+export function payOptions(accounts: Account[], keep?: string) {
+  const l = accountLabels(accounts).filter((x) => x !== PAY_CASH);
+  l.push(PAY_CASH, PAY_FRIEND);
+  if (keep && !l.includes(keep)) l.push(keep);
+  return l;
+}
+
+/** Para girişi seçenekleri (veride Türkçe saklanır, ekranda sözlükle çevrilir) */
+export const VIA = ["Wise", "Banka havalesi", "Nakit getirdim", "Döviz bürosu", "Revolut transferi", "Kart / Apple Pay", "Diğer"];
+export const INSRC = ["Hibe", "Burs", "Kredi", "Aile desteği", "Kendi param", "Hediye", "Diğer"];
+export const FREQ_MONTHLY = "Aylık";
+/** Para birimi seçenekleri */
+export const CURS = ["PLN", "EUR"];
+export const IN_CURS = ["EUR", "PLN", "TL"];
 
 export const SRC: Record<ExpenseSrc, [string, string]> = {
   bank: ["Banka ✓", "bank"],

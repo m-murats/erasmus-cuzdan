@@ -1,5 +1,5 @@
 // Ekranlar arasında ortak parçalar (prototipteki "shared pieces" bölümü)
-import { useEffect, useRef, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useI18n } from "../i18n/I18n";
 import { cfg, isDep, isPending, mine, sum, tripOf } from "../lib/calc";
 import { BANK_FALLBACK, BANK_STYLE, brandOf, catInfo } from "../lib/constants";
@@ -8,6 +8,13 @@ import { merchant } from "../lib/search";
 import type { Account, Balance, Dataset, Expense } from "../lib/types";
 import { Icon } from "./Icon";
 import { useApp } from "./state";
+
+/** Mavi "+" düğmesi: yeni harcama formunu açar */
+export function AddButton() {
+  const { t } = useI18n();
+  const { setSheet } = useApp();
+  return <button className="iconbtn primary" type="button" aria-label={t.expense.addLabel} onClick={() => setSheet({ kind: "expense" })}><Icon name="plus" /></button>;
+}
 
 export function TopBar({ title, back, actions, lead }: { title: string; back?: string; actions?: ReactNode; lead?: ReactNode }) {
   const { t } = useI18n();
@@ -158,3 +165,80 @@ export function Toast() {
 }
 
 export const esc = (s: string) => s.replace(/[&<>"']/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[ch]!);
+
+/** Silme gibi geri alınamayan işlemler: ilk basışta "Emin misin? Tekrar bas" der, ikincide yapar */
+export function ConfirmButton({ onConfirm, children, className = "btn danger left", label }: {
+  onConfirm: () => void | Promise<void>; children: ReactNode; className?: string; label?: string;
+}) {
+  const { t } = useI18n();
+  const [sure, setSure] = useState(false);
+  useEffect(() => {
+    if (!sure) return;
+    const i = setTimeout(() => setSure(false), 4000);
+    return () => clearTimeout(i);
+  }, [sure]);
+  return (
+    <button className={className} type="button" aria-label={label} onClick={() => (sure ? onConfirm() : setSure(true))}>
+      {sure ? t.form.sure : children}
+    </button>
+  );
+}
+
+/** Kaydetme/silme işlemlerini sarar: hata olursa kullanıcıya gösterir, başarılıysa true döner */
+export function useSaver() {
+  const { t } = useI18n();
+  const { toast } = useApp();
+  return async (fn: () => Promise<unknown>, okMsg?: string) => {
+    try {
+      await fn();
+      if (okMsg) toast(okMsg);
+      return true;
+    } catch (e) {
+      toast(t.form.saveError(String((e as Error)?.message || e)));
+      return false;
+    }
+  };
+}
+
+/** Kategori çubukları (prototipteki catRows). onPick verilirse satırlar tıklanabilir. */
+export function CatRows({ rows, total, onPick }: { rows: [string, { v: number; n: number }][]; total: number; onPick?: (cat: string) => void }) {
+  const { t, cat } = useI18n();
+  const max = Math.max(1, ...rows.map((r) => r[1].v));
+  return (
+    <div className="bars">
+      {rows.map(([n, o]) => {
+        const col = catInfo(n)[1];
+        return (
+          <button key={n} type="button" className="catrow" onClick={onPick ? () => onPick(n) : undefined} style={onPick ? undefined : { cursor: "default" }}>
+            <Avatar cat={n} />
+            <span className="mid">
+              <b>{cat(n)}</b><span className="small muted"> · {t.analysis.count(o.n)}</span>
+              <span className="track" style={{ display: "block" }}><i style={{ width: ((o.v / max) * 100).toFixed(1) + "%", background: col }} /></span>
+            </span>
+            <span className="amt num">{zl(o.v)}<small>%{total ? Math.round((o.v / total) * 100) : 0}</small></span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+/** En çok harcanan yerler (prototipteki merchantRows) — mağaza renkli avatarlarıyla */
+export function MerchantRows({ rows, limit = 8 }: { rows: [string, { v: number; n: number; cat: string }][]; limit?: number }) {
+  const { t } = useI18n();
+  const { setMerchantName, setSheet } = useApp();
+  return (
+    <>
+      {rows.slice(0, limit).map(([n, o]) => (
+        <button key={n} type="button" className="row" onClick={() => { setSheet(null); setMerchantName(n); location.hash = "yer"; }}>
+          <Avatar cat={o.cat} name={n} />
+          <span className="mid">
+            <span className="t" style={{ display: "block" }}>{n}</span>
+            <span className="s" style={{ display: "block" }}>{t.analysis.placeSub(o.n, zl(o.v / o.n))}</span>
+          </span>
+          <span className="amt num">{zl(o.v)}</span>
+        </button>
+      ))}
+    </>
+  );
+}

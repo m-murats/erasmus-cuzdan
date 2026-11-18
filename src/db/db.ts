@@ -92,3 +92,41 @@ export async function requestPersist() {
     /* desteklenmiyorsa sorun değil */
   }
 }
+
+// ---------- Yazma işlemleri (Aşama 2) ----------
+// Prototipteki save/remove ile aynı: her kayda `ts` (eklenme/düzenlenme zamanı) yazılır, meta.lastEdit güncellenir.
+
+export type RowTable = (typeof TABLES)[number];
+
+export const newId = (p: string) => p + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+
+/** Bir kaydı ekler ya da (aynı id varsa) değiştirir */
+export async function saveRow<T extends { id: string }>(table: RowTable, row: T, d: WalletDB = db) {
+  const now = new Date().toISOString();
+  await d.transaction("rw", d[table], d.kv, async () => {
+    await (d[table] as unknown as Table<T, string>).put({ ...row, ts: now });
+    await touch(d, now);
+  });
+}
+
+export async function removeRow(table: RowTable, id: string, d: WalletDB = db) {
+  await d.transaction("rw", d[table], d.kv, async () => {
+    await d[table].delete(id);
+    await touch(d, new Date().toISOString());
+  });
+}
+
+/** Ayarların bir kısmını değiştirir (diğer alanlar korunur) */
+export async function saveSettings(patch: Partial<Settings>, d: WalletDB = db) {
+  const now = new Date().toISOString();
+  await d.transaction("rw", d.kv, async () => {
+    const cur = ((await d.kv.get("settings"))?.value as Partial<Settings>) || {};
+    await d.kv.put({ key: "settings", value: { ...cur, ...patch, ts: now } as Partial<Settings> });
+    await touch(d, now);
+  });
+}
+
+async function touch(d: WalletDB, now: string) {
+  const cur = ((await d.kv.get("meta"))?.value as Meta) || {};
+  await d.kv.put({ key: "meta", value: { ...cur, lastEdit: now } });
+}
