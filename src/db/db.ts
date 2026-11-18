@@ -3,12 +3,12 @@
 // yeni bir db.version(N+1).stores(...).upgrade(...) ekle. Böylece kullanıcının verisi korunur.
 
 import Dexie, { type Table } from "dexie";
-import type { Account, Balance, Dataset, Expense, Inflow, Meta, Settings, Source, Transfer, Trip } from "../lib/types";
+import type { Account, Balance, Dataset, Expense, Inflow, Meta, Rules, Settings, Source, Transfer, Trip } from "../lib/types";
 
 /** Ayarlar ve meta tek satırlık kayıtlar olarak "kv" tablosunda tutulur */
 export interface KV {
-  key: "settings" | "meta";
-  value: Partial<Settings> | Meta;
+  key: "settings" | "meta" | "rules";
+  value: Partial<Settings> | Meta | Rules;
 }
 
 export class WalletDB extends Dexie {
@@ -44,15 +44,16 @@ const TABLES = ["expenses", "trips", "inflows", "sources", "accounts", "balances
 /** Tüm veriyi tek seferde okur */
 export async function loadAll(d: WalletDB = db): Promise<Dataset> {
   return d.transaction("r", [...TABLES.map((t) => d[t]), d.kv], async () => {
-    const [expenses, trips, inflows, sources, accounts, balances, transfers, s, m] = await Promise.all([
+    const [expenses, trips, inflows, sources, accounts, balances, transfers, s, m, r] = await Promise.all([
       d.expenses.toArray(), d.trips.toArray(), d.inflows.toArray(), d.sources.toArray(),
       d.accounts.orderBy("order").toArray(), d.balances.toArray(), d.transfers.toArray(),
-      d.kv.get("settings"), d.kv.get("meta"),
+      d.kv.get("settings"), d.kv.get("meta"), d.kv.get("rules"),
     ]);
     return {
       expenses, trips, inflows, sources, accounts, balances, transfers,
       settings: (s?.value as Partial<Settings>) || {},
       meta: (m?.value as Meta) || {},
+      rules: (r?.value as Rules) || {},
     };
   });
 }
@@ -69,7 +70,7 @@ export async function replaceAll(ds: Dataset, d: WalletDB = db) {
     await d.accounts.bulkAdd(ds.accounts);
     await d.balances.bulkAdd(ds.balances);
     await d.transfers.bulkAdd(ds.transfers);
-    await d.kv.bulkPut([{ key: "settings", value: ds.settings }, { key: "meta", value: ds.meta }]);
+    await d.kv.bulkPut([{ key: "settings", value: ds.settings }, { key: "meta", value: ds.meta }, { key: "rules", value: ds.rules || {} }]);
   });
 }
 
@@ -129,4 +130,25 @@ export async function saveSettings(patch: Partial<Settings>, d: WalletDB = db) {
 async function touch(d: WalletDB, now: string) {
   const cur = ((await d.kv.get("meta"))?.value as Meta) || {};
   await d.kv.put({ key: "meta", value: { ...cur, lastEdit: now } });
+}
+
+/** Banka dökümü içe aktarmasını tek işlemde yazar (ya hepsi ya hiçbiri). Yalnızca kullanıcı onayından sonra çağrılır.
+ *  İçe aktarılan harcamalara `ts` yazılmaz: kullanıcı girişi değil, banka kaydıdır ("kontrol bekliyor" sayılmaz). */
+export async function applyImport(
+  p: { expenses: Expense[]; transfers: Transfer[]; updates: Expense[]; transferUpdates: Transfer[]; rules: Rules },
+  lastImport: NonNullable<Meta["lastImport"]>,
+  d: WalletDB = db,
+) {
+  await d.transaction("rw", d.expenses, d.transfers, d.kv, async () => {
+    if (p.expenses.length) await d.expenses.bulkAdd(p.expenses);
+    if (p.updates.length) await d.expenses.bulkPut(p.updates);
+    if (p.transfers.length) await d.transfers.bulkAdd(p.transfers);
+    if (p.transferUpdates.length) await d.transfers.bulkPut(p.transferUpdates);
+    if (Object.keys(p.rules).length) {
+      const cur = ((await d.kv.get("rules"))?.value as Rules) || {};
+      await d.kv.put({ key: "rules", value: { ...cur, ...p.rules } });
+    }
+    const m = ((await d.kv.get("meta"))?.value as Meta) || {};
+    await d.kv.put({ key: "meta", value: { ...m, lastEdit: lastImport.at, lastImport } });
+  });
 }

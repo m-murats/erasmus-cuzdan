@@ -13,6 +13,7 @@ import { InflowForm } from "./screens/forms/InflowForm";
 import { Money } from "./screens/Money";
 import { Plan } from "./screens/Plan";
 import { Friends } from "./screens/Friends";
+import { Import } from "./screens/Import";
 import { TransferForm } from "./screens/forms/TransferForm";
 import { BalanceForm } from "./screens/forms/BalanceForm";
 import { TripDetail, Trips } from "./screens/Trips";
@@ -22,7 +23,7 @@ import { useApp, useHashRoute } from "./ui/state";
 /** Hangi ekran hangi alt menü sekmesini vurgular */
 const NAVOF: Record<string, string> = {
   ana: "ana", hareketler: "hareketler", analiz: "analiz", geziler: "geziler", para: "para", plan: "para",
-  daha: "ana", arkadaslar: "ana", ayarlar: "ana", yer: "hareketler",
+  daha: "ana", arkadaslar: "ana", iceaktar: "ana", ayarlar: "ana", yer: "hareketler",
 };
 
 export default function App() {
@@ -45,6 +46,7 @@ export default function App() {
   else if (view === "para") body = <Money ds={ds} />;
   else if (view === "plan") body = <Plan ds={ds} />;
   else if (view === "arkadaslar") body = <Friends ds={ds} />;
+  else if (view === "iceaktar") body = <Import ds={ds} />;
 
   const nav: [string, string, string][] = [
     ["ana", "house", t.nav.home], ["hareketler", "receipt", t.nav.tx], ["analiz", "chart-pie", t.nav.analysis],

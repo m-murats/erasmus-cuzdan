@@ -4,7 +4,7 @@ import { Icon } from "../ui/Icon";
 import { TopBar, UpdLine } from "../ui/parts";
 import { go } from "../ui/state";
 
-const ITEMS: [string, string][] = [["para", "wallet"], ["plan", "piggy-bank"], ["arkadaslar", "users"], ["ayarlar", "settings"]];
+const ITEMS: [string, string][] = [["iceaktar", "upload"], ["para", "wallet"], ["plan", "piggy-bank"], ["arkadaslar", "users"], ["ayarlar", "settings"]];
 
 export function More({ ds }: { ds: Dataset }) {
   const { t } = useI18n();
@@ -15,7 +15,7 @@ export function More({ ds }: { ds: Dataset }) {
       <section className="card menu">
         <div className="list">
           {ITEMS.map(([h, ic]) => {
-            const [title, sub] = t.more.items[h];
+            const [title, sub] = h === "iceaktar" ? t.imp.menu : t.more.items[h];
             return (
               <button key={h} type="button" className="row" onClick={() => go(h)}>
                 <span className="av" style={{ background: "var(--accent-soft)", color: "var(--accent)" }}><Icon name={ic} /></span>

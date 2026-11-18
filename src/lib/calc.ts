@@ -28,7 +28,7 @@ export const live = (ds: Dataset) => {
 };
 
 export const isPending = (ds: Pick<Dataset, "meta">, x: Expense) =>
-  !!x.ts && (!ds.meta?.lastBankCheckAt || x.ts > ds.meta.lastBankCheckAt);
+  !!x.ts && !x.bankRef && (!ds.meta?.lastBankCheckAt || x.ts > ds.meta.lastBankCheckAt);
 
 export const latestBalance = (ds: Pick<Dataset, "balances">): Balance | undefined =>
   [...ds.balances].sort((a, b) => (a.d < b.d ? 1 : -1))[0];

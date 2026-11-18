@@ -83,6 +83,7 @@ export function parseBackup(text: string): Dataset {
   return {
     settings: (j.settings as Dataset["settings"]) || {},
     meta: (j.meta as Dataset["meta"]) || {},
+    rules: j.rules && typeof j.rules === "object" ? (j.rules as Dataset["rules"]) : {},
     expenses: arr(j.expenses).map(expense),
     trips: arr(j.trips).map((t) => ({ ...t, id: ensureId(t, "t"), name: str(t.name), start: str(t.start), end: str(t.end), cities: Array.isArray(t.cities) ? t.cities.map(String) : [] }) as Trip),
     inflows: arr(j.inflows).map((x) => ({ ...x, id: ensureId(x, "f"), d: str(x.d), desc: str(x.desc), amount: num(x.amount), cur: str(x.cur) || "EUR", fee: num(x.fee), source: str(x.source), via: str(x.via), to: str(x.to), note: str(x.note) }) as Inflow),
@@ -108,6 +109,7 @@ export function makeBackup(ds: Dataset, now = new Date()): string {
       accounts: ds.accounts,
       balances: ds.balances,
       transfers: ds.transfers,
+      rules: ds.rules || {},
     },
     null,
     1,

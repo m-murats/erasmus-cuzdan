@@ -1,0 +1,35 @@
+"Current Accounts Summaries",,,,,,,,,,,,
+,,,,,,,,,,,,
+"Personal Account (PLN)",,,,,,,,,,,,
+,,,,,,,,,,,,
+"Account Number (IBAN)",LT000000000000000000,"Opening date","Oct 6, 2026",,,,,,,,,
+---------,,,,,,,,,,,,
+,,,,,,,,,,,,
+"Current Accounts Transaction Statements",,,,,,,,,,,,
+,,,,,,,,,,,,
+"Personal Account (PLN)",,,,,,,,,,,,
+,,,,,,,,,,,,
+"Transaction statement",,,,,,,,,,,,
+Date,Description,Category,"Money in/out",Balance,"Tax withheld","Other taxes",Fees,,,,,
+"Oct 7, 2026","Exchanged to PLN",Exchange,"872.65 PLN","872.65 PLN","0.00 PLN","0.00 PLN","0.00 PLN",,,,,
+"Oct 9, 2026",Biedronka,Merchant,"-25.33 PLN","847.32 PLN","0.00 PLN","0.00 PLN","0.00 PLN",,,,,
+"Oct 10, 2026","Exchanged to PLN",Exchange,"864.96 PLN","1,712.28 PLN","0.00 PLN","0.00 PLN","8.74 PLN",,,,,
+"Oct 11, 2026","Uber Payments B.V.*Amsterdam",Others,"-6.56 PLN","1,705.72 PLN","0.00 PLN","0.00 PLN","0.00 PLN",,,,,
+"Oct 13, 2026","Transfer to ORNEK ARKADAS",Others,"-10.00 PLN","1,695.72 PLN","0.00 PLN","0.00 PLN","0.00 PLN",,,,,
+"Oct 26, 2026","Ornek Telefon",Merchant,"-1.00 PLN","1,694.72 PLN","0.00 PLN","0.00 PLN","0.00 PLN",,,,,
+"Oct 27, 2026","Ornek Telefon",Refund,"1.00 PLN","1,695.72 PLN","0.00 PLN","0.00 PLN","0.00 PLN",,,,,
+Total,,,"1,695.72 PLN",,"0.00 PLN","0.00 PLN","8.74 PLN",,,,,
+,,,,,,,,,,,,
+---------,,,,,,,,,,,,
+,,,,,,,,,,,,
+"Personal Account (EUR)",,,,,,,,,,,,
+,,,,,,,,,,,,
+"Transaction statement",,,,,,,,,,,,
+Date,Description,Category,"Money in/out","Money in/out",Balance,Balance,"Tax withheld","Tax withheld","Other taxes","Other taxes",Fees,Fees
+"Oct 7, 2026","Apple Pay top-up by *0000","Top up",€200.00,"873.00 PLN",€200.00,"873.00 PLN",€0.00,"0.00 PLN",€0.00,"0.00 PLN",€0.00,"0.00 PLN"
+"Nov 3, 2026",Booking.com,Merchant,-€44.10,"-194.86 PLN",€155.90,"688.14 PLN",€0.00,"0.00 PLN",€0.00,"0.00 PLN",€0.00,"0.00 PLN"
+"Nov 10, 2026","Transfer from ORNEK ARKADAS",Others,€14.00,"61.60 PLN",€169.90,"749.74 PLN",€0.00,"0.00 PLN",€0.00,"0.00 PLN",€0.00,"0.00 PLN"
+"Nov 14, 2026",Atac,Merchant,-€8.50,"-37.40 PLN",€161.40,"712.34 PLN",€0.00,"0.00 PLN",€0.00,"0.00 PLN",€0.00,"0.00 PLN"
+"Nov 14, 2026","Revolut Bank UAB",Others,€50.00,"220.00 PLN",€211.40,"932.34 PLN",€0.00,"0.00 PLN",€0.00,"0.00 PLN",€0.00,"0.00 PLN"
+Total,,,€211.40,"932.34 PLN",,,€0.00,"0.00 PLN",€0.00,"0.00 PLN",€0.00,"0.00 PLN"
+---------,,,,,,,,,,,,

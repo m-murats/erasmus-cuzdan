@@ -25,6 +25,10 @@ export interface Expense {
   kind?: "deposit";
   /** Kullanıcının eklediği/düzenlediği zaman (ISO) */
   ts?: string;
+  /** Banka dökümündeki satırın kimliği (içe aktarılan ya da dökümle eşleşen kayıtlar) */
+  bankRef?: string;
+  /** Bu harcamadan düşülmüş iadelerin banka kimlikleri */
+  refundRefs?: string[];
 }
 
 export interface Trip {
@@ -91,6 +95,7 @@ export interface Transfer {
   cur: Cur;
   why: string;
   closed: boolean;
+  bankRef?: string;
 }
 
 export interface FixedPayment {
@@ -127,7 +132,12 @@ export interface Meta {
   bankCheckNote?: string;
   /** Son JSON yedeğinin indirildiği zaman */
   lastBackupAt?: string;
+  /** Son banka dökümü içe aktarması */
+  lastImport?: { at: string; file: string; from: string; to: string; added: number; dup: number };
 }
+
+/** Kullanıcının düzeltmelerinden öğrenilen kurallar: satıcı anahtarı → kategori */
+export type Rules = Record<string, string>;
 
 /** Uygulamanın tüm verisi */
 export interface Dataset {
@@ -140,4 +150,6 @@ export interface Dataset {
   accounts: Account[];
   balances: Balance[];
   transfers: Transfer[];
+  /** Öğrenilen kategori kuralları (eski yedeklerde yok → boş) */
+  rules?: Rules;
 }
