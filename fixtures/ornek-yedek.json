@@ -1,0 +1,36 @@
+{
+ "format": "erasmus-cuzdan-v1",
+ "exported": "2026-11-30T12:00:00Z",
+ "settings": {"eurpln": 4, "plntl": 10, "eurtl": 40, "budget": 2000, "start": "2026-10-01", "end": "2027-01-31",
+   "deposit": 500, "trTL": 50000, "totalTL": 100000, "tripBudget": 1000, "buffer": 10, "incomeLeft": 2, "overrun": 0,
+   "fixed": [{"name": "Kira", "amount": 600, "left": 2, "monthly": true}, {"name": "Bilet", "amount": 800, "left": 1, "monthly": false}]},
+ "meta": {"lastEdit": "2026-11-15T10:00:00.000Z", "bankCheckedThrough": "2026-11-09", "lastBankCheckAt": "2026-11-10T00:00:00.000Z"},
+ "expenses": [
+  {"id": "e1", "d": "2026-09-28", "desc": "Gelmeden önce", "cat": "Diğer", "pay": "Nakit", "gross": 50, "cur": "PLN", "share": 50, "trip": "", "city": "", "note": "", "src": "cash"},
+  {"id": "e2", "d": "2026-10-05", "desc": "Biedronka", "cat": "Market", "pay": "Revolut PLN", "gross": 100, "cur": "PLN", "share": 100, "trip": "", "city": "", "note": "", "src": "bank"},
+  {"id": "e3", "d": "2026-10-06", "desc": "Yurt depozitosu", "cat": "Yurt & Konaklama", "pay": "Nakit", "gross": 500, "cur": "PLN", "share": 500, "trip": "", "city": "", "note": "", "src": "cash", "kind": "deposit"},
+  {"id": "e4", "d": "2026-10-20", "desc": "Roma – McDonald's (2 kişi)", "cat": "Yeme-İçme (dışarıda)", "pay": "Revolut EUR", "gross": 20, "cur": "EUR", "share": 10, "trip": "t1", "city": "Roma", "note": "Ayşe ile bölüştük", "src": "bank"},
+  {"id": "e5", "d": "2026-11-02", "desc": "Bolt", "cat": "Şehir İçi Ulaşım", "pay": "Revolut PLN", "gross": 30, "cur": "PLN", "share": 30, "trip": "", "city": "", "note": "", "src": "bank"},
+  {"id": "e6", "d": "2026-11-12", "desc": "Restoran", "cat": "Yeme-İçme (dışarıda)", "pay": "Revolut PLN", "gross": 90, "cur": "PLN", "share": 0, "trip": "", "city": "", "note": "Can için ödendi", "src": "bank", "ts": "2026-11-12T10:00:00.000Z"},
+  {"id": "e7", "d": "2026-11-15", "desc": "Zabka", "cat": "Market", "pay": "Nakit", "gross": 25.5, "cur": "PLN", "share": 25.5, "trip": "", "city": "", "note": "", "src": "cash", "ts": "2026-11-09T10:00:00.000Z"}
+ ],
+ "trips": [{"id": "t1", "name": "İtalya", "start": "2026-10-20", "end": "2026-10-22", "cities": ["Roma"], "with": "Ayşe", "note": ""}],
+ "inflows": [
+  {"id": "f1", "d": "2026-09-29", "desc": "Nakit euro", "amount": 1000, "cur": "EUR", "fee": 0, "pln": 4100, "source": "Kendi param", "via": "Nakit getirdim", "to": "Nakit", "note": ""},
+  {"id": "f2", "d": "2026-10-10", "desc": "Hibe", "amount": 500, "cur": "EUR", "fee": 10, "source": "Hibe", "via": "Banka havalesi", "to": "Erste EUR", "note": ""}
+ ],
+ "sources": [
+  {"id": "s1", "name": "Burs", "amount": 5000, "cur": "TL", "freq": "Aylık", "note": "", "order": 1},
+  {"id": "s2", "name": "Aile", "amount": 100, "cur": "EUR", "freq": "Aylık", "note": "", "order": 2},
+  {"id": "s3", "name": "Erasmus hibesi", "amount": 1000, "cur": "EUR", "freq": "Tek seferlik", "note": "", "order": 3}
+ ],
+ "balances": [
+  {"id": "b1", "d": "2026-10-15", "revPLN": 100, "revEUR": 0, "erstePLN": 0, "ersteEUR": 0, "cashPLN": 0, "cashEUR": 0},
+  {"id": "b2", "d": "2026-11-15", "revPLN": 1000, "revEUR": 100, "erstePLN": 2000, "ersteEUR": 500, "cashPLN": 300, "cashEUR": 0, "ts": "2026-11-15T09:00:00.000Z"}
+ ],
+ "transfers": [
+  {"id": "p1", "d": "2026-10-08", "who": "Ali", "acct": "Revolut PLN", "amount": 50, "cur": "PLN", "why": "", "closed": false},
+  {"id": "p2", "d": "2026-10-09", "who": "Ali (ev)", "acct": "Revolut PLN", "amount": -20, "cur": "PLN", "why": "", "closed": false},
+  {"id": "p3", "d": "2026-10-10", "who": "Can", "acct": "Revolut EUR", "amount": 10, "cur": "EUR", "why": "", "closed": true}
+ ]
+}
