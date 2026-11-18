@@ -1,0 +1,45 @@
+# GitHub Pages'e otomatik yayın.
+# main dalına her gönderimde (push): kurulum → testler → derleme → yayın. Testler geçmezse yayın yapılmaz.
+# Not: data/ klasörü git'e girmediği için gerçek verilerle yapılan testler burada kendiliğinden atlanır.
+name: Yayın
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: # GitHub'da "Run workflow" düğmesiyle elle de çalıştırılabilir
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  derle:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  yayinla:
+    needs: derle
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

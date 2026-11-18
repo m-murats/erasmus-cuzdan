@@ -219,6 +219,10 @@ const tr = {
     lastImport: (d: string, n: number) => `Son içe aktarma: ${d} · ${n} yeni harcama`,
     errColumns: (c: string) => `Bu bir Revolut dökümü gibi görünmüyor (eksik sütun: ${c}).`, errEmpty: "Dosyada işlem yok.",
   },
+  pwa: {
+    newVersion: "Uygulamanın yeni sürümü hazır.", reload: "Yenile",
+    offlineReady: "Uygulama artık internetsiz de açılır.",
+  },
   errors: {
     readFile: "Dosya okunamadı",
     notJson: "Dosya okunamadı: geçerli bir JSON yedeği değil.",
@@ -457,6 +461,10 @@ const en: Dict = {
     done: (n: number) => `Imported · ${n} new ${n === 1 ? "expense" : "expenses"}`,
     lastImport: (d: string, n: number) => `Last import: ${d} · ${n} new ${n === 1 ? "expense" : "expenses"}`,
     errColumns: (c: string) => `This doesn't look like a Revolut statement (missing column: ${c}).`, errEmpty: "The file has no transactions.",
+  },
+  pwa: {
+    newVersion: "A new version of the app is ready.", reload: "Reload",
+    offlineReady: "The app now works offline too.",
   },
   errors: {
     readFile: "Could not read the file",

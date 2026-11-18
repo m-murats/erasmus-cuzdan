@@ -230,3 +230,6 @@ input[type=search]::-webkit-search-cancel-button{-webkit-appearance:none;display
 /* Aşama 2: koyu temada siyah logolu mağaza avatarları arka planda kaybolmasın */
 :root[data-theme="dark"] .av.brand{box-shadow:inset 0 0 0 1px rgba(255,255,255,.14)}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .av.brand{box-shadow:inset 0 0 0 1px rgba(255,255,255,.14)}}
+/* Aşama 4: "yeni sürüm hazır" çubuğu (alt menünün hemen üstünde) */
+.updbar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(76px + env(safe-area-inset-bottom,0px));z-index:55;width:min(560px,calc(100% - 32px));display:flex;gap:8px;align-items:center;background:var(--surface);color:var(--ink);border-radius:16px;padding:10px 12px;box-shadow:0 8px 30px rgba(0,0,0,.18);font-size:14px;font-weight:700}
+.updbar span{flex:1;min-width:0}

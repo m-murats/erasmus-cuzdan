@@ -14,7 +14,8 @@ const files = existsSync(dir) ? readdirSync(dir).filter((f) => /\.csv$/i.test(f)
 const backupName = existsSync(dir) ? readdirSync(dir).filter((f) => /^erasmus-cuzdan-yedek-.*\.json$/.test(f)).sort().pop() : undefined;
 
 describe.skipIf(!files.length || !backupName)("gerçek Revolut dökümleri", () => {
-  const ds = parseBackup(read(backupName!));
+  // describe.skipIf atlasa da bu blok çalışır: dosya yoksa okumaya çalışma
+  const ds = backupName ? parseBackup(read(backupName)) : (null as never);
   for (const f of files) {
     it(f + ": yeni bir şey eklenmiyor", () => {
       const p = buildPreview(ds, parseStatement(read(f)), {

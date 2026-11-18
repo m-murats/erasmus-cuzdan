@@ -18,6 +18,7 @@ import { TransferForm } from "./screens/forms/TransferForm";
 import { BalanceForm } from "./screens/forms/BalanceForm";
 import { TripDetail, Trips } from "./screens/Trips";
 import { Sheet, Toast } from "./ui/parts";
+import { UpdatePrompt } from "./ui/UpdatePrompt";
 import { useApp, useHashRoute } from "./ui/state";
 
 /** Hangi ekran hangi alt menü sekmesini vurgular */
@@ -74,6 +75,7 @@ export default function App() {
         {sheet?.kind === "restore" && <RestorePreview data={sheet.data} exported={sheet.exported} />}
       </Sheet>
       <Toast />
+      <UpdatePrompt />
     </>
   );
 }
